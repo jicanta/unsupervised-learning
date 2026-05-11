@@ -103,6 +103,26 @@ save_boxplot(
     "pca_europe_boxplot_standardized.png",
 )
 
+
+def save_pc1_index_plot(labels, scores):
+    pc1_index = pd.DataFrame({"Country": labels, "PC1": scores[:, 0]}).sort_values("PC1")
+    colors = ["crimson" if value < 0 else "seagreen" for value in pc1_index["PC1"]]
+
+    fig, ax = plt.subplots(figsize=(14, 7))
+    ax.bar(pc1_index["Country"], pc1_index["PC1"], color=colors, alpha=0.85)
+    ax.axhline(0, color="gray", linewidth=0.9)
+    ax.set_title("Indice de paises segun PC1")
+    ax.set_xlabel("Pais")
+    ax.set_ylabel("PC1")
+    ax.grid(axis="y", alpha=0.3)
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    fig.tight_layout()
+
+    output_path = IMAGES_DIR / "pca_europe_pc1_index.png"
+    fig.savefig(output_path, dpi=300, bbox_inches="tight")
+    print(f"Imagen guardada: {output_path}")
+    plt.close(fig)
+
 def annotate_countries(ax, points, labels):
     for i, label in enumerate(labels):
         dx, dy = COUNTRY_LABEL_OFFSETS[i % len(COUNTRY_LABEL_OFFSETS)]
@@ -190,3 +210,5 @@ biplot(
     countries,
     features
 )
+
+save_pc1_index_plot(countries, X_pca)
