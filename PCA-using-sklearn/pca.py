@@ -25,7 +25,7 @@ COUNTRY_LABEL_OFFSETS = [
 
 df = pd.read_csv(DATA_FILE)
 
-print("Primeras filas:")
+print("First rows:")
 print(df.head())
 
 countries = df["Country"]
@@ -42,11 +42,11 @@ X_pca = pca.fit_transform(X_scaled)
 
 explained_variance = pca.explained_variance_ratio_
 
-print("\nVarianza explicada por componente:")
+print("\nExplained variance by component:")
 for i, var in enumerate(explained_variance):
     print(f"PC{i+1}: {var:.4f} ({var*100:.2f}%)")
 
-print("\nVarianza acumulada:")
+print("\nCumulative variance:")
 for i, var in enumerate(np.cumsum(explained_variance)):
     print(f"PC1..PC{i+1}: {var:.4f} ({var*100:.2f}%)")
 
@@ -56,7 +56,7 @@ loadings = pd.DataFrame(
     index=features
 )
 
-print("\nCargas de las variables:")
+print("\nVariable loadings:")
 print(loadings)
 
 
@@ -86,20 +86,20 @@ def save_boxplot(data, title, y_label, output_name):
 
     output_path = IMAGES_DIR / output_name
     fig.savefig(output_path, dpi=300, bbox_inches="tight")
-    print(f"Imagen guardada: {output_path}")
+    print(f"Saved image: {output_path}")
     plt.close(fig)
 
 
 save_boxplot(
     X,
-    "Distribucion de variables originales - Europa",
-    "Valor original",
+    "Original Feature Distribution - Europe",
+    "Original value",
     "pca_europe_boxplot_raw.png",
 )
 save_boxplot(
     X_scaled_df,
-    "Distribucion de variables estandarizadas - Europa",
-    "Valor estandarizado",
+    "Standardized Feature Distribution - Europe",
+    "Standardized value",
     "pca_europe_boxplot_standardized.png",
 )
 
@@ -111,8 +111,8 @@ def save_pc1_index_plot(labels, scores):
     fig, ax = plt.subplots(figsize=(14, 7))
     ax.bar(pc1_index["Country"], pc1_index["PC1"], color=colors, alpha=0.85)
     ax.axhline(0, color="gray", linewidth=0.9)
-    ax.set_title("Indice de paises segun PC1")
-    ax.set_xlabel("Pais")
+    ax.set_title("Countries by PC1 Score")
+    ax.set_xlabel("Country")
     ax.set_ylabel("PC1")
     ax.grid(axis="y", alpha=0.3)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
@@ -120,7 +120,7 @@ def save_pc1_index_plot(labels, scores):
 
     output_path = IMAGES_DIR / "pca_europe_pc1_index.png"
     fig.savefig(output_path, dpi=300, bbox_inches="tight")
-    print(f"Imagen guardada: {output_path}")
+    print(f"Saved image: {output_path}")
     plt.close(fig)
 
 def annotate_countries(ax, points, labels):
@@ -143,15 +143,15 @@ annotate_countries(ax, X_pca, countries)
 
 ax.axhline(0, color="gray", linewidth=0.8)
 ax.axvline(0, color="gray", linewidth=0.8)
-ax.set_xlabel(f"PC1 ({explained_variance[0]*100:.2f}% varianza)")
-ax.set_ylabel(f"PC2 ({explained_variance[1]*100:.2f}% varianza)")
-ax.set_title("PCA - Países de Europa")
+ax.set_xlabel(f"PC1 ({explained_variance[0]*100:.2f}% variance)")
+ax.set_ylabel(f"PC2 ({explained_variance[1]*100:.2f}% variance)")
+ax.set_title("PCA - European Countries")
 ax.grid(True, alpha=0.3)
 fig.tight_layout()
 
 scatter_output = IMAGES_DIR / "pca_europe_scatter.png"
 fig.savefig(scatter_output, dpi=300, bbox_inches="tight")
-print(f"\nImagen guardada: {scatter_output}")
+print(f"\nSaved image: {scatter_output}")
 
 plt.show()
 
@@ -191,15 +191,15 @@ def biplot(scores, loadings, labels, feature_names):
     ax.axhline(0, color="gray", linewidth=0.8)
     ax.axvline(0, color="gray", linewidth=0.8)
 
-    ax.set_xlabel(f"PC1 ({explained_variance[0]*100:.2f}% varianza)")
-    ax.set_ylabel(f"PC2 ({explained_variance[1]*100:.2f}% varianza)")
-    ax.set_title("Biplot PCA - Europa")
+    ax.set_xlabel(f"PC1 ({explained_variance[0]*100:.2f}% variance)")
+    ax.set_ylabel(f"PC2 ({explained_variance[1]*100:.2f}% variance)")
+    ax.set_title("PCA Biplot - Europe")
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
 
     biplot_output = IMAGES_DIR / "pca_europe_biplot.png"
     fig.savefig(biplot_output, dpi=300, bbox_inches="tight")
-    print(f"Imagen guardada: {biplot_output}")
+    print(f"Saved image: {biplot_output}")
 
     plt.show()
 
