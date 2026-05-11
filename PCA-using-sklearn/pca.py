@@ -30,6 +30,7 @@ print(df.head())
 
 countries = df["Country"]
 X = df.drop(columns=["Country"])
+correlation_matrix = X.corr()
 
 features = X.columns
 
@@ -41,6 +42,13 @@ pca = PCA()
 X_pca = pca.fit_transform(X_scaled)
 
 explained_variance = pca.explained_variance_ratio_
+eigenvalues = pca.explained_variance_
+
+eigenvectors_df = pd.DataFrame(
+    pca.components_.T,
+    columns=[f"PC{i+1}" for i in range(len(features))],
+    index=features,
+)
 
 print("\nExplained variance by component:")
 for i, var in enumerate(explained_variance):
@@ -50,14 +58,40 @@ print("\nCumulative variance:")
 for i, var in enumerate(np.cumsum(explained_variance)):
     print(f"PC1..PC{i+1}: {var:.4f} ({var*100:.2f}%)")
 
-loadings = pd.DataFrame(
-    pca.components_.T,
-    columns=[f"PC{i+1}" for i in range(len(features))],
-    index=features
-)
+print("\nCorrelation matrix:")
+print(correlation_matrix.round(4))
 
-print("\nVariable loadings:")
-print(loadings)
+print("\nEigenvalues:")
+for i, value in enumerate(eigenvalues):
+    print(f"PC{i+1}: {value:.4f}")
+
+print("\nEigenvectors:")
+print(eigenvectors_df)
+
+
+def save_correlation_matrix_plot(matrix):
+    fig, ax = plt.subplots(figsize=(9, 7))
+    heatmap = ax.imshow(matrix.values, cmap="coolwarm", vmin=-1, vmax=1)
+
+    ax.set_xticks(range(len(matrix.columns)), labels=matrix.columns)
+    ax.set_yticks(range(len(matrix.index)), labels=matrix.index)
+    plt.setp(ax.get_xticklabels(), rotation=35, ha="right")
+    ax.set_title("Feature Correlation Matrix - Europe")
+
+    for row in range(len(matrix.index)):
+        for col in range(len(matrix.columns)):
+            value = matrix.iat[row, col]
+            text_color = "white" if abs(value) > 0.55 else "black"
+            ax.text(col, row, f"{value:.2f}", ha="center", va="center", color=text_color, fontsize=9)
+
+    colorbar = fig.colorbar(heatmap, ax=ax, fraction=0.046, pad=0.04)
+    colorbar.set_label("Correlation")
+    fig.tight_layout()
+
+    output_path = IMAGES_DIR / "pca_europe_correlation_matrix.png"
+    fig.savefig(output_path, dpi=300, bbox_inches="tight")
+    print(f"Saved image: {output_path}")
+    plt.close(fig)
 
 
 def save_boxplot(data, title, y_label, output_name):
@@ -88,6 +122,9 @@ def save_boxplot(data, title, y_label, output_name):
     fig.savefig(output_path, dpi=300, bbox_inches="tight")
     print(f"Saved image: {output_path}")
     plt.close(fig)
+
+
+save_correlation_matrix_plot(correlation_matrix)
 
 
 save_boxplot(
@@ -206,7 +243,7 @@ def biplot(scores, loadings, labels, feature_names):
 
 biplot(
     X_pca,
-    pca.components_.T,
+    eigenvectors_df.to_numpy(),
     countries,
     features
 )
