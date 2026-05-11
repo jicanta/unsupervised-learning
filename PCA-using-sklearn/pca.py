@@ -35,6 +35,7 @@ features = X.columns
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
+X_scaled_df = pd.DataFrame(X_scaled, columns=features)
 
 pca = PCA()
 X_pca = pca.fit_transform(X_scaled)
@@ -57,6 +58,50 @@ loadings = pd.DataFrame(
 
 print("\nCargas de las variables:")
 print(loadings)
+
+
+def save_boxplot(data, title, y_label, output_name):
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.boxplot(
+        [data[column] for column in data.columns],
+        tick_labels=data.columns,
+        patch_artist=True,
+        boxprops={"facecolor": "lightsteelblue", "edgecolor": "steelblue", "alpha": 0.85},
+        medianprops={"color": "darkred", "linewidth": 1.5},
+        whiskerprops={"color": "slategray"},
+        capprops={"color": "slategray"},
+        flierprops={
+            "marker": "o",
+            "markersize": 4,
+            "markerfacecolor": "gray",
+            "markeredgecolor": "none",
+            "alpha": 0.5,
+        },
+    )
+    ax.set_title(title)
+    ax.set_ylabel(y_label)
+    ax.grid(axis="y", alpha=0.3)
+    plt.setp(ax.get_xticklabels(), rotation=25, ha="right")
+    fig.tight_layout()
+
+    output_path = IMAGES_DIR / output_name
+    fig.savefig(output_path, dpi=300, bbox_inches="tight")
+    print(f"Imagen guardada: {output_path}")
+    plt.close(fig)
+
+
+save_boxplot(
+    X,
+    "Distribucion de variables originales - Europa",
+    "Valor original",
+    "pca_europe_boxplot_raw.png",
+)
+save_boxplot(
+    X_scaled_df,
+    "Distribucion de variables estandarizadas - Europa",
+    "Valor estandarizado",
+    "pca_europe_boxplot_standardized.png",
+)
 
 def annotate_countries(ax, points, labels):
     for i, label in enumerate(labels):
